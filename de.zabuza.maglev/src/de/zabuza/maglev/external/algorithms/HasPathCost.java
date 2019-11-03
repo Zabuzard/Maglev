@@ -1,4 +1,4 @@
-package de.zabuza.maglev.external.algorithms.shortestpath;
+package de.zabuza.maglev.external.algorithms;
 
 /**
  * Interface for classes that provide path costs.

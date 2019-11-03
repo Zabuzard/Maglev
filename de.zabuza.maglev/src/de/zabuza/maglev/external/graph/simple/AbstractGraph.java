@@ -1,7 +1,7 @@
-package de.zabuza.maglev.external.model.imp;
+package de.zabuza.maglev.external.graph.simple;
 
-import de.zabuza.maglev.external.model.Edge;
-import de.zabuza.maglev.external.model.Graph;
+import de.zabuza.maglev.external.graph.Edge;
+import de.zabuza.maglev.external.graph.Graph;
 
 import java.util.Collection;
 import java.util.Map;
@@ -10,18 +10,17 @@ import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 /**
- * Abstract implementation of the {@link Graph} model. Implements some utility
- * methods and everything related to edges.
+ * Abstract implementation of the {@link Graph} model. Implements some utility methods and everything related to edges.
  * <p>
- * The core methods that deal with nodes, like {@link #addNode(N)},
- * {@link #removeNode(N)} and {@link #getNodes()}, as well as
- * {@link #reverse()} are not implemented.
+ * The core methods that deal with nodes, like {@link #addNode(Object)}, {@link #removeNode(Object)} and {@link
+ * #getNodes()}, as well as {@link #reverse()} are not implemented.
  *
  * @param <N> The type of nodes
  * @param <E> The type of edges
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
+@SuppressWarnings("DesignForExtension")
 public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E> {
 	/**
 	 * The amount of edges in this graph.
@@ -31,7 +30,8 @@ public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E>
 	/**
 	 * Creates a new, initially empty, graph.
 	 */
-	public AbstractGraph() {
+	@SuppressWarnings("WeakerAccess")
+	protected AbstractGraph() {
 		amountOfEdges = 0;
 	}
 
@@ -126,8 +126,7 @@ public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E>
 	}
 
 	/**
-	 * Constructs a set which is used to hold edges. The set must initially
-	 * contain the given edge.
+	 * Constructs a set which is used to hold edges. The set must initially contain the given edge.
 	 *
 	 * @param edge The edge to add to the set
 	 *
@@ -136,24 +135,22 @@ public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E>
 	protected abstract Set<E> constructEdgeSetWith(E edge);
 
 	/**
-	 * Gets a map that connects nodes to their incoming edges. The map is backed
-	 * by the graph, changes will be reflected in the graph.<br>
+	 * Gets a map that connects nodes to their incoming edges. The map is backed by the graph, changes will be reflected
+	 * in the graph.<br>
 	 * <br>
-	 * Do only change the map directly if you know the consequences. Else the
-	 * graph can easily get into a corrupted state. In many situations it is best
-	 * to use the given methods like {@link #addEdge(Edge)} instead.
+	 * Do only change the map directly if you know the consequences. Else the graph can easily get into a corrupted
+	 * state. In many situations it is best to use the given methods like {@link #addEdge(Edge)} instead.
 	 *
 	 * @return A map connecting nodes to their incoming edges
 	 */
 	protected abstract Map<N, Set<E>> getNodeToIncomingEdges();
 
 	/**
-	 * Gets a map that connects nodes to their outgoing edges. The map is backed
-	 * by the graph, changes will be reflected in the graph.<br>
+	 * Gets a map that connects nodes to their outgoing edges. The map is backed by the graph, changes will be reflected
+	 * in the graph.<br>
 	 * <br>
-	 * Do only change the map directly if you know the consequences. Else the
-	 * graph can easily get into a corrupted state. In many situations it is best
-	 * to use the given methods like {@link #addEdge(Edge)} instead.
+	 * Do only change the map directly if you know the consequences. Else the graph can easily get into a corrupted
+	 * state. In many situations it is best to use the given methods like {@link #addEdge(Edge)} instead.
 	 *
 	 * @return A map connecting nodes to their outgoing edges
 	 */
@@ -162,8 +159,7 @@ public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E>
 	/**
 	 * Removes the given edge from the given map by using the given key.<br>
 	 * <br>
-	 * If the edge set is empty after removal, the key is removed from the map
-	 * too.
+	 * If the edge set is empty after removal, the key is removed from the map too.
 	 *
 	 * @param edge        The edge to remove
 	 * @param keyNode     The key of the set where the edge is to be removed from
@@ -172,7 +168,7 @@ public abstract class AbstractGraph<N, E extends Edge<N>> implements Graph<N, E>
 	 * @return <tt>True</tt> if the edge was found and thus removed,
 	 * <tt>false</tt> otherwise
 	 */
-	private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, Set<E>> nodeToEdges) {
+	private boolean removeEdgeFromMap(final E edge, final N keyNode, final Map<N, ? extends Set<E>> nodeToEdges) {
 		final Set<E> edges = nodeToEdges.get(keyNode);
 		if (edges != null) {
 			final boolean wasRemoved = edges.remove(edge);

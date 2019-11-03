@@ -1,4 +1,4 @@
-package de.zabuza.maglev.external.model;
+package de.zabuza.maglev.external.graph;
 
 /**
  * Interface for a weighted directed edge that connects two nodes.

@@ -1,64 +1,51 @@
 package de.zabuza.maglev.internal.algorithms.shortestpath;
 
-import de.zabuza.maglev.external.algorithms.shortestpath.HasPathCost;
-import de.zabuza.maglev.external.algorithms.shortestpath.Path;
-import de.zabuza.maglev.external.model.Edge;
-import de.zabuza.maglev.external.model.Graph;
+import de.zabuza.maglev.external.algorithms.HasPathCost;
+import de.zabuza.maglev.external.algorithms.Path;
+import de.zabuza.maglev.external.algorithms.TentativeDistance;
+import de.zabuza.maglev.external.graph.Edge;
+import de.zabuza.maglev.external.graph.Graph;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * Implementation of Dijkstras algorithm that is able to compute shortest paths
- * on a given graph.<br>
+ * Implementation of Dijkstras algorithm that is able to compute shortest paths on a given graph.<br>
  * <br>
- * Dijkstra has no sense of goal direction. When finishing the computation of
- * the shortest path it has also computed all shortest paths to nodes less far
- * away, so the <i>search space</i> is rather big.<br>
+ * Dijkstra has no sense of goal direction. When finishing the computation of the shortest path it has also computed all
+ * shortest paths to nodes less far away, so the <i>search space</i> is rather big.<br>
  * <br>
- * Subclasses can override {@link #considerEdgeForRelaxation(Edge, N)} and
- * {@link #getEstimatedDistance(N, N)} to speedup the algorithm by
- * giving it a sense of goal direction or exploiting precomputed knowledge.
+ * Subclasses can override {@link #doConsiderEdgeForRelaxation(Edge, Object)} and {@link #getEstimatedDistance(Object,
+ * Object)} to speedup the algorithm by giving it a sense of goal direction or exploiting precomputed knowledge.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
+@SuppressWarnings("DesignForExtension")
 public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputation<N, E> {
 	/**
 	 * The graph to operate on.
 	 */
-	private final Graph<N, E> graph;
+	private final Graph<? super N, E> graph;
 
 	/**
 	 * Creates a new Dijkstra instance which operates on the given graph.
 	 *
 	 * @param graph The graph to operate on
 	 */
-	public Dijkstra(final Graph<N, E> graph) {
+	public Dijkstra(final Graph<? super N, E> graph) {
 		this.graph = graph;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.
-	 * IShortestPathComputation# computeSearchSpace(java.util.Collection,
-	 * de.unifreiburg.informatik.cobweb.routing.model.graph.INode)
-	 */
 	@Override
-	public Collection<N> computeSearchSpace(final Collection<N> sources, final N destination) {
+	public Collection<N> searchSpace(final Collection<? extends N> sources, final N destination) {
 		return computeShortestPathCostHelper(sources, null).keySet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.
-	 * IShortestPathComputation# computeShortestPath(java.util.Collection,
-	 * de.unifreiburg.informatik.cobweb.routing.model.graph.INode)
-	 */
 	@Override
-	public Optional<Path<N, E>> computeShortestPath(final Collection<N> sources, final N destination) {
+	public Optional<Path<N, E>> shortestPath(final Collection<? extends N> sources, final N destination) {
 		final Map<N, TentativeDistance<N, E>> nodeToDistance = computeShortestPathCostHelper(sources, destination);
 		final TentativeDistance<N, E> destinationDistance = nodeToDistance.get(destination);
 
@@ -75,7 +62,7 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 
 		// Build the path reversely by following the pointers from the destination
 		// to one of the sources
-		final EdgePath<N, E> path = new EdgePath<>(true);
+		final EdgePath<N, E> path = new EdgePath<>(EdgePath.ConstructionDirection.BACKWARD);
 		TentativeDistance<N, E> currentDistanceContainer = destinationDistance;
 		E currentEdge = parentEdge;
 		while (currentEdge != null) {
@@ -94,52 +81,34 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 		return Optional.of(path);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.
-	 * IShortestPathComputation# computeShortestPathCost(java.util.Collection,
-	 * de.unifreiburg.informatik.cobweb.routing.model.graph.INode)
-	 */
 	@Override
-	public Optional<Double> computeShortestPathCost(final Collection<N> sources, final N destination) {
+	public Optional<Double> shortestPathCost(final Collection<? extends N> sources, final N destination) {
 		final Map<N, TentativeDistance<N, E>> nodeToDistance = computeShortestPathCostHelper(sources, destination);
 		return Optional.ofNullable(nodeToDistance.get(destination))
 				.map(TentativeDistance::getTentativeDistance);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.unifreiburg.informatik.cobweb.routing.algorithms.shortestpath.
-	 * IShortestPathComputation#
-	 * computeShortestPathCostsReachable(java.util.Collection)
-	 */
 	@Override
-	public Map<N, ? extends HasPathCost> computeShortestPathCostsReachable(final Collection<N> sources) {
+	public Map<N, ? extends HasPathCost> shortestPathCostsReachable(final Collection<? extends N> sources) {
 		return computeShortestPathCostHelper(sources, null);
 	}
 
 	/**
-	 * Computes the shortest path from the given sources to the given destination
-	 * and to all other nodes that were visited in the mean time.<br>
+	 * Computes the shortest path from the given sources to the given destination and to all other nodes that were
+	 * visited in the mean time.<br>
 	 * <br>
-	 * The shortest path from multiple sources is the minimal shortest path for
-	 * all source nodes individually. If the destination is <tt>null</tt> the
-	 * shortest paths to all nodes in the graph are computed.
+	 * The shortest path from multiple sources is the minimal shortest path for all source nodes individually. If the
+	 * destination is {@code null} the shortest paths to all nodes in the graph are computed.
 	 *
 	 * @param sources         The sources to compute the shortest path from
-	 * @param pathDestination The destination to compute the shortest path to or
-	 *                        <tt>null</tt> if not present
+	 * @param pathDestination The destination to compute the shortest path to or {@code null} if not present
 	 *
-	 * @return A map connecting all visited nodes to their tentative distance
-	 * container. The container represent the shortest path from the
-	 * sources to that given node as destination.
+	 * @return A map connecting all visited nodes to their tentative distance container. The container represent the
+	 * shortest path from the sources to that given node as destination.
 	 */
-	protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<N> sources,
+	@SuppressWarnings("WeakerAccess")
+	protected Map<N, TentativeDistance<N, E>> computeShortestPathCostHelper(final Collection<? extends N> sources,
 			final N pathDestination) {
-		// TODO Evaluate if maps should be exchanged against IdMap if Dijkstra is
-		// about to settle all reachable nodes. Note that node IDs may have gaps
-		// since the set of reachable nodes is in general not equal to all nodes of
-		// the graph.
 		final Map<N, TentativeDistance<N, E>> nodeToDistance = new HashMap<>(sources.size());
 		final Map<N, TentativeDistance<N, E>> nodeToSettledDistance = new HashMap<>(sources.size());
 		final PriorityQueue<TentativeDistance<N, E>> activeNodes = new PriorityQueue<>(sources.size());
@@ -171,6 +140,7 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 
 			// End the algorithm if destination was settled or a subclass
 			// implementation demands it
+			//noinspection PointlessNullCheck
 			if ((pathDestination != null && node.equals(pathDestination)) || shouldAbort(distance)) {
 				break;
 			}
@@ -178,7 +148,7 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 			// Relax all outgoing edges
 			provideEdgesToRelax(distance).forEach(edge -> {
 				// Skip the edge if it should not be considered
-				if (!considerEdgeForRelaxation(edge, pathDestination)) {
+				if (!doConsiderEdgeForRelaxation(edge, pathDestination)) {
 					return;
 				}
 
@@ -224,27 +194,24 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	}
 
 	/**
-	 * Whether or not the given edge should be considered for relaxation. The
-	 * algorithm will ignore the edge and not follow it if this method returns
-	 * <tt>false</tt>.
+	 * Whether or not the given edge should be considered for relaxation. The algorithm will ignore the edge and not
+	 * follow it if this method returns {@code false}.
 	 *
 	 * @param edge            The edge in question
-	 * @param pathDestination The destination of the shortest path computation or
-	 *                        <tt>null</tt> if not present
+	 * @param pathDestination The destination of the shortest path computation or {@code null} if not present
 	 *
-	 * @return <tt>True</tt> if the edge should be considered, <tt>false</tt>
-	 * otherwise
+	 * @return {@code True} if the edge should be considered, {@code false} otherwise
 	 */
-	@SuppressWarnings("unused")
-	protected boolean considerEdgeForRelaxation(final E edge, final N pathDestination) {
+	@SuppressWarnings({ "unused", "WeakerAccess", "BooleanMethodNameMustStartWithQuestion" })
+	protected boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination) {
 		// Dijkstras algorithm considers every outgoing edge.
 		// This method may be used by extending classes to improve performance.
 		return true;
 	}
 
 	/**
-	 * Gets an estimate about the shortest path distance from the given node to
-	 * the destination of the shortest path computation.<br>
+	 * Gets an estimate about the shortest path distance from the given node to the destination of the shortest path
+	 * computation.<br>
 	 * <br>
 	 * The estimate must be <i>monotone</i> and <i>admissible</i>.
 	 *
@@ -253,7 +220,7 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	 *
 	 * @return An estimate about the shortest path distance
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "WeakerAccess" })
 	protected double getEstimatedDistance(final N node, final N pathDestination) {
 		// Dijkstras algorithm does not use estimations. It makes the worst possible
 		// guess of 0 for every node.
@@ -264,15 +231,15 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	/**
 	 * Provides the cost of a given edge.<br>
 	 * <br>
-	 * The base is the result of {@link Edge#getCost()}. Implementations are
-	 * allowed to override this method in order to modify the cost.
+	 * The base is the result of {@link Edge#getCost()}. Implementations are allowed to override this method in order to
+	 * modify the cost.
 	 *
 	 * @param edge              The edge whose cost to provide
-	 * @param tentativeDistance The current tentative distance when relaxing this
-	 *                          edge
+	 * @param tentativeDistance The current tentative distance when relaxing this edge
 	 *
 	 * @return Stream of edges to process for relaxation
 	 */
+	@SuppressWarnings("WeakerAccess")
 	protected double provideEdgeCost(final E edge, @SuppressWarnings("unused") final double tentativeDistance) {
 		return edge.getCost();
 	}
@@ -280,30 +247,28 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	/**
 	 * Generates a stream of edges to process for relaxation.<br>
 	 * <br>
-	 * The base are all outgoing edges of the given node. Implementations are
-	 * allowed to override this method in order to further filter the stream.
-	 * Additionally, the method {@link #considerEdgeForRelaxation(Edge, N)}
-	 * will be called on each element of this stream.
+	 * The base are all outgoing edges of the given node. Implementations are allowed to override this method in order
+	 * to further filter the stream. Additionally, the method {@link #doConsiderEdgeForRelaxation(Edge, Object)} will be
+	 * called on each element of this stream.
 	 *
-	 * @param tentativeDistance The tentative distance wrapper of the node to
-	 *                          relax edges of
+	 * @param tentativeDistance The tentative distance wrapper of the node to relax edges of
 	 *
 	 * @return Stream of edges to process for relaxation
 	 */
-	protected Stream<E> provideEdgesToRelax(final TentativeDistance<N, E> tentativeDistance) {
+	@SuppressWarnings("WeakerAccess")
+	protected Stream<E> provideEdgesToRelax(final TentativeDistance<? extends N, E> tentativeDistance) {
 		return graph.getOutgoingEdges(tentativeDistance.getNode());
 	}
 
 	/**
-	 * Whether or not the algorithm should abort computation of the shortest path.
-	 * The method is called right after the given node has been settled.
+	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right after the
+	 * given node has been settled.
 	 *
-	 * @param tentativeDistance The tentative distance wrapper of the node that
-	 *                          was settled
+	 * @param tentativeDistance The tentative distance wrapper of the node that was settled
 	 *
-	 * @return <tt>True</tt> if the computation should be aborted, <tt>false</tt>
-	 * if not
+	 * @return {@code True} if the computation should be aborted, {@code false} if not
 	 */
+	@SuppressWarnings("WeakerAccess")
 	protected boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
 		// Dijkstras algorithm relaxes the whole network, it only aborts if the
 		// target was settled. However, the method can be used by subclasses to
@@ -315,18 +280,15 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	/**
 	 * Creates a tentative distance container for the given node.<br>
 	 * <br>
-	 * If the <tt>pathDestination</tt> is not <tt>null</tt> the container will
-	 * also include an estimated distance from the node to the destination. This
-	 * is computed using {@link #getEstimatedDistance(N, N)}.
+	 * If the {@code pathDestination} is not {@code null} the container will also include an estimated distance from the
+	 * node to the destination. This is computed using {@link #getEstimatedDistance(N, N)}.
 	 *
 	 * @param node              The node to create the container for
-	 * @param parentEdge        The parent edge that lead to that node, used for
-	 *                          shortest path construction by backtracking
-	 * @param tentativeDistance The tentative distance from the source to that
-	 *                          node, i.e. the total cost of backtracking the
-	 *                          given parent edges to the source
-	 * @param pathDestination   The destination of the shortest path computation
-	 *                          or <tt>null</tt> if not present
+	 * @param parentEdge        The parent edge that lead to that node, used for shortest path construction by
+	 *                          backtracking
+	 * @param tentativeDistance The tentative distance from the source to that node, i.e. the total cost of backtracking
+	 *                          the given parent edges to the source
+	 * @param pathDestination   The destination of the shortest path computation or {@code null} if not present
 	 *
 	 * @return A tentative distance container for the given node
 	 */

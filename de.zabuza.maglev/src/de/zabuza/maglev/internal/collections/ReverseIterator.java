@@ -18,8 +18,7 @@ public final class ReverseIterator<E> implements Iterator<E> {
 	private final ListIterator<E> listIterator;
 
 	/**
-	 * Creates a new reverse iterator which is able to reversely iterate the given
-	 * list.
+	 * Creates a new reverse iterator which is able to reversely iterate the given list.
 	 *
 	 * @param list The list to iterate over
 	 */

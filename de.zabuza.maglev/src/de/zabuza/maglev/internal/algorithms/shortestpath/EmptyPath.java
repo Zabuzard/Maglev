@@ -1,15 +1,14 @@
 package de.zabuza.maglev.internal.algorithms.shortestpath;
 
-import de.zabuza.maglev.external.algorithms.shortestpath.EdgeCost;
-import de.zabuza.maglev.external.algorithms.shortestpath.Path;
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.algorithms.EdgeCost;
+import de.zabuza.maglev.external.algorithms.Path;
+import de.zabuza.maglev.external.graph.Edge;
 
 import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Implementation of {@link Path} which represent an empty path. That is a path
- * with no edges and only one node.
+ * Implementation of {@link Path} which represent an empty path. That is a path with no edges and only one node.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
@@ -31,11 +30,13 @@ public final class EmptyPath<N, E extends Edge<N>> implements Path<N, E> {
 		this.node = node;
 	}
 
+	@SuppressWarnings("SuspiciousGetterSetter")
 	@Override
 	public N getDestination() {
 		return node;
 	}
 
+	@SuppressWarnings("SuspiciousGetterSetter")
 	@Override
 	public N getSource() {
 		return node;

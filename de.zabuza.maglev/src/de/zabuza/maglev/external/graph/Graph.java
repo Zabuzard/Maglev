@@ -1,11 +1,10 @@
-package de.zabuza.maglev.external.model;
+package de.zabuza.maglev.external.graph;
 
 import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
- * Interface for a graph model. A graph consists of nodes and edges connecting
- * the nodes.
+ * Interface for a graph model. A graph consists of nodes and edges connecting the nodes.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
@@ -18,8 +17,7 @@ public interface Graph<N, E extends Edge<N>> {
 	 *
 	 * @param edge The edge to add, not null
 	 *
-	 * @return {@code True} if the edge was not already contained and thus added,
-	 * {@code false} otherwise
+	 * @return {@code True} if the edge was not already contained and thus added, {@code false} otherwise
 	 */
 	boolean addEdge(E edge);
 
@@ -28,8 +26,7 @@ public interface Graph<N, E extends Edge<N>> {
 	 *
 	 * @param node The node to add, not null
 	 *
-	 * @return {@code True} if the node was not already contained and thus added,
-	 * {@code false} otherwise
+	 * @return {@code True} if the node was not already contained and thus added, {@code false} otherwise
 	 */
 	boolean addNode(N node);
 
@@ -38,22 +35,19 @@ public interface Graph<N, E extends Edge<N>> {
 	 *
 	 * @param edge The edge in question, not null
 	 *
-	 * @return {@code True} if the edge is contained in the graph, {@code false}
-	 * otherwise
+	 * @return {@code True} if the edge is contained in the graph, {@code false} otherwise
 	 */
 	boolean containsEdge(E edge);
 
 	/**
-	 * Gets the amount of edges contained in the graph. This operation runs
-	 * in {@code O(1)}.
+	 * Gets the amount of edges contained in the graph. This operation runs in {@code O(1)}.
 	 *
 	 * @return The amount of edges contained in the graph
 	 */
 	int getAmountOfEdges();
 
 	/**
-	 * A stream over all edges this graph contains. The construction of the stream
-	 * runs in {@code O(1)}.
+	 * A stream over all edges this graph contains. The construction of the stream runs in {@code O(1)}.
 	 *
 	 * @return A stream over all edges this graph contains
 	 */
@@ -71,8 +65,7 @@ public interface Graph<N, E extends Edge<N>> {
 	/**
 	 * Gets a collection of all nodes that the graph contains.<br>
 	 * <br>
-	 * There are no guarantees made on if the collection is backed by the graph or
-	 * not.
+	 * There are no guarantees made on if the collection is backed by the graph or not.
 	 *
 	 * @return A collection of all contained nodes
 	 */
@@ -92,8 +85,7 @@ public interface Graph<N, E extends Edge<N>> {
 	 *
 	 * @param edge The edge to remove, not null
 	 *
-	 * @return {@code True} if the edge was contained and thus removed,
-	 * {@code false} otherwise
+	 * @return {@code True} if the edge was contained and thus removed, {@code false} otherwise
 	 */
 	boolean removeEdge(E edge);
 
@@ -102,29 +94,24 @@ public interface Graph<N, E extends Edge<N>> {
 	 *
 	 * @param node The node to remove, not null
 	 *
-	 * @return {@code True} if the node was contained and thus removed,
-	 * {@code false} otherwise
+	 * @return {@code True} if the node was contained and thus removed, {@code false} otherwise
 	 */
 	boolean removeNode(N node);
 
 	/**
-	 * Reverses the graph. That is, all directed edges switch source with
-	 * destination.
+	 * Reverses the graph. That is, all directed edges switch source with destination.
 	 * <p>
-	 * There are no requirements made on the time complexity. It is up to the
-	 * implementing class if this method runs fast or if it explicitly reverses
-	 * each edge. Algorithms will use this method, so its complexity has a direct
+	 * There are no requirements made on the time complexity. It is up to the implementing class if this method runs
+	 * fast or if it explicitly reverses each edge. Algorithms will use this method, so its complexity has a direct
 	 * impact on algorithm performance.
 	 * <p>
-	 * Edges retrieved before the reversal must
-	 * remain equal to the edges after the reversal, according to their
-	 * {@code equals} method.
+	 * Edges retrieved before the reversal must remain equal to the edges after the reversal, according to their {@code
+	 * equals} method.
 	 */
 	void reverse();
 
 	/**
-	 * Gets the amount of nodes contained in the graph. This operation runs
-	 * in {@code O(1)}.
+	 * Gets the amount of nodes contained in the graph. This operation runs in {@code O(1)}.
 	 *
 	 * @return The amount of nodes contained in the graph
 	 */

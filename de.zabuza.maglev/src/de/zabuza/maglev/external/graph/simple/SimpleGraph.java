@@ -1,12 +1,11 @@
-package de.zabuza.maglev.external.model.imp;
+package de.zabuza.maglev.external.graph.simple;
 
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.graph.Edge;
 
 import java.util.*;
 
 /**
- * Basic implementation of a graph which operates on given nodes and
- * {@link BasicEdge}s. It is capable of implicitly
+ * Basic implementation of a graph which operates on given nodes and {@link SimpleEdge}s. It is capable of implicitly
  * reversing nodes in constant time.
  *
  * @param <N> The type of nodes
@@ -14,7 +13,7 @@ import java.util.*;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends AbstractGraph<N, E>
+public final class SimpleGraph<N, E extends Edge<N> & ReversedConsumer> extends AbstractGraph<N, E>
 		implements ReversedProvider {
 	/**
 	 * A set with all contained nodes.
@@ -36,7 +35,7 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 	/**
 	 * Creates a new initially empty graph.
 	 */
-	public BasicGraph() {
+	public SimpleGraph() {
 		nodes = new HashSet<>();
 		nodeToIncomingEdges = new HashMap<>();
 		nodeToOutgoingEdges = new HashMap<>();
@@ -53,6 +52,7 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 		return nodes.add(node);
 	}
 
+	@SuppressWarnings("SuspiciousGetterSetter")
 	@Override
 	public boolean isReversed() {
 		return isReversed;
@@ -61,11 +61,11 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 	/**
 	 * Gets a collection of all nodes that the graph contains.<br>
 	 * <br>
-	 * The collection is backed by the graph, changes will be reflected in the
-	 * graph. Do only change the collection directly if you know the consequences.
-	 * Else the graph can easily get into a corrupted state. In many situations it
-	 * is best to use the given methods like {@link #addNode(N)} instead.
+	 * The collection is backed by the graph, changes will be reflected in the graph. Do only change the collection
+	 * directly if you know the consequences. Else the graph can easily get into a corrupted state. In many situations
+	 * it is best to use the given methods like {@link #addNode(Object)} instead.
 	 */
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
 	public Collection<N> getNodes() {
 		return nodes;
@@ -77,11 +77,9 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 	}
 
 	/**
-	 * Reverses the graph. That is, all directed edges switch source with
-	 * destination.<br>
+	 * Reverses the graph. That is, all directed edges switch source with destination.<br>
 	 * <br>
-	 * The implementation runs in constant time, edge reversal is only made
-	 * implicit.
+	 * The implementation runs in constant time, edge reversal is only made implicit.
 	 */
 	@Override
 	public void reverse() {
@@ -93,6 +91,7 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 		return new HashSet<>(Collections.singletonList(edge));
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
 	protected Map<N, Set<E>> getNodeToIncomingEdges() {
 		if (isReversed) {
@@ -101,6 +100,7 @@ public final class BasicGraph<N, E extends Edge<N> & ReversedConsumer> extends A
 		return nodeToIncomingEdges;
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
 	protected Map<N, Set<E>> getNodeToOutgoingEdges() {
 		if (isReversed) {

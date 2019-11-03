@@ -1,6 +1,6 @@
-package de.zabuza.maglev.external.model.imp;
+package de.zabuza.maglev.external.graph.simple;
 
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.graph.Edge;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -12,7 +12,7 @@ import java.util.StringJoiner;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class BasicEdge<N> implements Edge<N>, ReversedConsumer {
+public final class SimpleEdge<N> implements Edge<N>, ReversedConsumer {
 	/**
 	 * The cost of the edge, i.e. its weight.
 	 */
@@ -26,20 +26,20 @@ public final class BasicEdge<N> implements Edge<N>, ReversedConsumer {
 	 */
 	private final N source;
 	/**
-	 * An object that provides a reversed flag or <tt>null</tt> if not present.
-	 * Can be used to determine if the edge should be interpreted as reversed to
-	 * implement implicit edge reversal at constant time.
+	 * An object that provides a reversed flag or <tt>null</tt> if not present. Can be used to determine if the edge
+	 * should be interpreted as reversed to implement implicit edge reversal at constant time.
 	 */
 	private ReversedProvider reversedProvider;
 
 	/**
-	 * Creates a new basic edge.
+	 * Creates a new simple edge.
 	 *
 	 * @param source      The source node of the edge, not null
 	 * @param destination The destination node of the edge, not null
 	 * @param cost        The cost of the edge, i.e. its weight, not negative
 	 */
-	public BasicEdge(final N source, final N destination, final double cost) {
+	@SuppressWarnings("WeakerAccess")
+	public SimpleEdge(final N source, final N destination, final double cost) {
 		if (cost < 0) {
 			throw new IllegalArgumentException("Cost must not be negative");
 		}
@@ -50,7 +50,7 @@ public final class BasicEdge<N> implements Edge<N>, ReversedConsumer {
 
 	@Override
 	public String toString() {
-		return new StringJoiner(", ", BasicEdge.class.getSimpleName() + "[", "]").add(
+		return new StringJoiner(", ", SimpleEdge.class.getSimpleName() + "[", "]").add(
 				getSource() + " -(" + cost + ")-> " + getDestination())
 				.toString();
 	}
@@ -63,9 +63,9 @@ public final class BasicEdge<N> implements Edge<N>, ReversedConsumer {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		final BasicEdge<?> basicEdge = (BasicEdge<?>) o;
-		return Double.compare(basicEdge.cost, cost) == 0 && destination.equals(basicEdge.destination) && source.equals(
-				basicEdge.source);
+		final SimpleEdge<?> simpleEdge = (SimpleEdge<?>) o;
+		return Double.compare(simpleEdge.cost, cost) == 0 && destination.equals(simpleEdge.destination)
+				&& source.equals(simpleEdge.source);
 	}
 
 	@Override

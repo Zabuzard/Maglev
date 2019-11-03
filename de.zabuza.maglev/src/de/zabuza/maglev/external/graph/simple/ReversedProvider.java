@@ -1,10 +1,11 @@
-package de.zabuza.maglev.external.model.imp;
+package de.zabuza.maglev.external.graph.simple;
 
 /**
  * Interface for objects that provide a reversed state flag.
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
+@SuppressWarnings("WeakerAccess")
 @FunctionalInterface
 public interface ReversedProvider {
 	/**

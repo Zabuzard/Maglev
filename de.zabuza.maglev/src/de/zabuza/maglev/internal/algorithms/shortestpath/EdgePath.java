@@ -1,19 +1,19 @@
 package de.zabuza.maglev.internal.algorithms.shortestpath;
 
-import de.zabuza.maglev.external.algorithms.shortestpath.EdgeCost;
-import de.zabuza.maglev.external.algorithms.shortestpath.Path;
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.algorithms.EdgeCost;
+import de.zabuza.maglev.external.algorithms.Path;
+import de.zabuza.maglev.external.graph.Edge;
 import de.zabuza.maglev.internal.collections.ReverseIterator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.StringJoiner;
 
 /**
  * Implementation of a {@link Path} which connects edges.<br>
  * <br>
- * Does not support empty paths, i.e. paths without any edges, use
- * {@link EmptyPath} instead. It can be build reversely without additional
- * overhead when iterating.
+ * Does not support empty paths, i.e. paths without any edges, use {@link EmptyPath} instead. It can be build reversely
+ * without additional overhead when iterating.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
@@ -22,111 +22,136 @@ import java.util.Iterator;
  */
 public final class EdgePath<N, E extends Edge<N>> implements Path<N, E> {
 	/**
-	 * Whether or not the path is build reversely.
+	 * Direction the path is built in.
 	 */
-	private final boolean mBuildReversely;
+	private final ConstructionDirection constructionDirection;
 	/**
 	 * The edges this path consists of.
 	 */
-	private final ArrayList<EdgeCost<N, E>> mEdges;
+	private final ArrayList<EdgeCost<N, E>> edges;
 	/**
 	 * The total cost of the path, i.e. the sum of all edges cost.
 	 */
-	private double mTotalCost;
+	private double totalCost;
 
 	/**
-	 * Creates a new initially empty edge path that is not built reversely.
+	 * Creates a new initially empty edge path that is not build reversely.
 	 */
-	public EdgePath() {
-		this(false);
+	@SuppressWarnings("WeakerAccess")
+	EdgePath() {
+		this(ConstructionDirection.FORWARD);
 	}
 
 	/**
 	 * Creates a new initially empty edge path that can be build reversely
 	 *
-	 * @param buildReversely Whether or not the path is build reversely. If
-	 *                       <tt>true</tt> calls to
-	 *                       {@link #addEdge(Edge, double)} are interpreted to
-	 *                       start from the end of the path. So the destination of
-	 *                       the first added edge is the destination of the path
-	 *                       and the source of the last added edge is the source
-	 *                       of the path.
+	 * @param constructionDirection Direction to construct the path in. If {@link ConstructionDirection#BACKWARD}, calls
+	 *                              to {@link #addEdge(Edge, double)} are interpreted to begin from the end of the path.
+	 *                              So the destination of the first added edge is the destination of the path and the
+	 *                              source of the last added edge is the source of the path.
 	 */
-	public EdgePath(final boolean buildReversely) {
-		mBuildReversely = buildReversely;
-		mEdges = new ArrayList<>();
+	EdgePath(final ConstructionDirection constructionDirection) {
+		this.constructionDirection = constructionDirection;
+		edges = new ArrayList<>();
+	}
+
+	@Override
+	public String toString() {
+		final StringJoiner pathJoiner = new StringJoiner(", ", "[", "]");
+		for (final EdgeCost<N, E> edgeCost : this) {
+			final Edge<N> edge = edgeCost.getEdge();
+			pathJoiner.add(edge.getSource() + " -(" + edgeCost.getCost() + ")-> " + edge.getDestination());
+		}
+
+		return new StringJoiner(", ", EdgePath.class.getSimpleName() + "[", "]").add("totalCost=" + totalCost)
+				.add("path=" + pathJoiner)
+				.toString();
 	}
 
 	/**
 	 * Adds the given edge to this path.<br>
 	 * <br>
-	 * If the path is to be build reversely the edges are interpreted to start
-	 * from the end of the path. So the destination of the first added edge is the
-	 * destination of the path and the source of the last added edge is the source
-	 * of the path.
+	 * If the path is to be build reversely the edges are interpreted to start from the end of the path. So the
+	 * destination of the first added edge is the destination of the path and the source of the last added edge is the
+	 * source of the path.
 	 *
 	 * @param edge The edge to add
 	 * @param cost The cost of the edge
 	 */
 	public void addEdge(final E edge, final double cost) {
-		mEdges.add(new EdgeCost<>(edge, cost));
-		mTotalCost += cost;
+		edges.add(new EdgeCost<>(edge, cost));
+		totalCost += cost;
 	}
 
 	@Override
 	public N getDestination() {
-		int destinationIndex;
-		if (mBuildReversely) {
-			// Destination is the first entry
-			destinationIndex = 0;
-		} else {
-			// Destination is the last entry
-			destinationIndex = mEdges.size() - 1;
+		final int destinationIndex;
+		switch (constructionDirection) {
+			case BACKWARD:
+				// Destination is the first entry
+				destinationIndex = 0;
+				break;
+			case FORWARD:
+				// Destination is the last entry
+				destinationIndex = edges.size() - 1;
+				break;
+			default:
+				throw new AssertionError();
 		}
-		return mEdges.get(destinationIndex)
+		return edges.get(destinationIndex)
 				.getEdge()
 				.getDestination();
 	}
 
 	@Override
 	public N getSource() {
-		int sourceIndex;
-		if (mBuildReversely) {
-			// Source is the last entry
-			sourceIndex = mEdges.size() - 1;
-		} else {
-			// Source is the first entry
-			sourceIndex = 0;
+		final int sourceIndex;
+		switch (constructionDirection) {
+			case BACKWARD:
+				// Source is the last entry
+				sourceIndex = edges.size() - 1;
+				break;
+			case FORWARD:
+				// Source is the first entry
+				sourceIndex = 0;
+				break;
+			default:
+				throw new AssertionError();
 		}
-		return mEdges.get(sourceIndex)
+		return edges.get(sourceIndex)
 				.getEdge()
 				.getSource();
 	}
 
 	@Override
 	public double getTotalCost() {
-		return mTotalCost;
-	}
-
-	/**
-	 * Whether or not the path is build reversely.
-	 *
-	 * @return <tt>True</tt> if the path is build reversely, <tt>false</tt> if not
-	 */
-	public boolean isBuildReversely() {
-		return mBuildReversely;
+		return totalCost;
 	}
 
 	@Override
 	public Iterator<EdgeCost<N, E>> iterator() {
-		if (mBuildReversely) {
-			return new ReverseIterator<>(mEdges);
+		if (constructionDirection == ConstructionDirection.BACKWARD) {
+			return new ReverseIterator<>(edges);
 		}
-		return mEdges.iterator();
+		return edges.iterator();
 	}
 
 	@Override
 	public int length() {
-		return mEdges.size();
+		return edges.size();
+	}
+
+	/**
+	 * Direction to construct an edge in.
+	 */
+	enum ConstructionDirection {
+		/**
+		 * Edge is constructed forwards.
+		 */
+		FORWARD,
+		/**
+		 * Edge is constructed backwards.
+		 */
+		BACKWARD
 	}
 }

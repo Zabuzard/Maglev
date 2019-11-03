@@ -1,10 +1,9 @@
-package de.zabuza.maglev.external.algorithms.shortestpath;
+package de.zabuza.maglev.external.algorithms;
 
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.graph.Edge;
 
 /**
- * Interface for a path that consists of a source and destination node and edges
- * which lead to the destination.
+ * Interface for a path that consists of a source and destination node and edges which lead to the destination.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
@@ -27,8 +26,7 @@ public interface Path<N, E extends Edge<N>> extends Iterable<EdgeCost<N, E>> {
 	N getSource();
 
 	/**
-	 * Gets the total cost of the path. That is the sum of all edge costs the path
-	 * consists of.
+	 * Gets the total cost of the path. That is the sum of all edge costs the path consists of.
 	 *
 	 * @return The total cost of the path, not negative
 	 */

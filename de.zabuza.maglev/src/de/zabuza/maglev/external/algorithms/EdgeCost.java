@@ -1,12 +1,12 @@
-package de.zabuza.maglev.external.algorithms.shortestpath;
+package de.zabuza.maglev.external.algorithms;
 
-import de.zabuza.maglev.external.model.Edge;
+import de.zabuza.maglev.external.graph.Edge;
 
 import java.util.Objects;
 
 /**
- * POJO class that wraps an edge and cost. Can be used to group a different cost
- * than the default cost provided by the edge with the edge.
+ * Class that wraps an edge and cost. Can be used to group a different cost than the default cost provided by the edge
+ * with the edge.
  *
  * @param <N> The type of the node
  * @param <E> The type of the edge
