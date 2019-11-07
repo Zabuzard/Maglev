@@ -141,6 +141,14 @@ public final class EdgePath<N, E extends Edge<N>> implements Path<N, E> {
 		return edges.size();
 	}
 
+	@Override
+	public Iterator<EdgeCost<N, E>> reverseIterator() {
+		if (constructionDirection == ConstructionDirection.BACKWARD) {
+			return edges.iterator();
+		}
+		return new ReverseIterator<>(edges);
+	}
+
 	/**
 	 * Direction to construct an edge in.
 	 */

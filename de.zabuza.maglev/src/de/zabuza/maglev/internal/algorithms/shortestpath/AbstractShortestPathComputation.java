@@ -2,6 +2,7 @@ package de.zabuza.maglev.internal.algorithms.shortestpath;
 
 import de.zabuza.maglev.external.algorithms.HasPathCost;
 import de.zabuza.maglev.external.algorithms.Path;
+import de.zabuza.maglev.external.algorithms.PathTree;
 import de.zabuza.maglev.external.algorithms.ShortestPathComputation;
 import de.zabuza.maglev.external.graph.Edge;
 
@@ -40,6 +41,11 @@ public abstract class AbstractShortestPathComputation<N, E extends Edge<N>> impl
 	@Override
 	public Map<N, ? extends HasPathCost> shortestPathCostsReachable(final N source) {
 		return shortestPathCostsReachable(Collections.singletonList(source));
+	}
+
+	@Override
+	public PathTree<N, E> shortestPathReachable(final N source) {
+		return shortestPathReachable(Collections.singletonList(source));
 	}
 
 }

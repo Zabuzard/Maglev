@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public class AbortIfModule<N, E extends Edge<N>> implements DijkstraModule<N, E> {
+public final class AbortAfterIfModule<N, E extends Edge<N>> implements DijkstraModule<N, E> {
 
 	/**
 	 * Creates an module which aborts computation after exploring to a node which matches the given predicate.
@@ -28,9 +28,9 @@ public class AbortIfModule<N, E extends Edge<N>> implements DijkstraModule<N, E>
 	 *
 	 * @return The created module
 	 */
-	public static <N, E extends Edge<N>> AbortIfModule<N, E> of(
+	public static <N, E extends Edge<N>> AbortAfterIfModule<N, E> of(
 			final Predicate<? super TentativeDistance<N, E>> predicate) {
-		return new AbortIfModule<>(predicate);
+		return new AbortAfterIfModule<>(predicate);
 	}
 
 	/**
@@ -43,12 +43,12 @@ public class AbortIfModule<N, E extends Edge<N>> implements DijkstraModule<N, E>
 	 *
 	 * @param predicate The predicate to test the node against
 	 */
-	AbortIfModule(final Predicate<? super TentativeDistance<N, E>> predicate) {
+	private AbortAfterIfModule(final Predicate<? super TentativeDistance<N, E>> predicate) {
 		this.predicate = predicate;
 	}
 
 	@Override
-	public final boolean shouldAbort(final TentativeDistance<N, E> tentativeDistance) {
+	public boolean shouldAbortAfter(final TentativeDistance<N, E> tentativeDistance) {
 		return predicate.test(tentativeDistance);
 	}
 

@@ -13,7 +13,8 @@ import java.util.*;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class SimpleGraph<N, E extends Edge<N> & ReversedConsumer> extends AbstractGraph<N, E>
+@SuppressWarnings("DesignForExtension")
+public class SimpleGraph<N, E extends Edge<N> & ReversedConsumer> extends AbstractGraph<N, E>
 		implements ReversedProvider {
 	/**
 	 * A set with all contained nodes.

@@ -57,4 +57,8 @@ public final class EmptyPath<N, E extends Edge<N>> implements Path<N, E> {
 		return 0;
 	}
 
+	@Override
+	public Iterator<EdgeCost<N, E>> reverseIterator() {
+		return Collections.emptyListIterator();
+	}
 }

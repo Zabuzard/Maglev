@@ -106,4 +106,24 @@ public interface ShortestPathComputation<N, E extends Edge<N>> {
 	 * @return A map which connects destination nodes to the costs of their shortest path
 	 */
 	Map<N, ? extends HasPathCost> shortestPathCostsReachable(N source);
+
+	/**
+	 * Computes all shortest paths from the given sources to all other nodes.<br>
+	 * <br>
+	 * The shortest path from multiple sources is the minimal shortest path for all source nodes individually.
+	 *
+	 * @param sources The sources to compute the shortest path from
+	 *
+	 * @return A tree containing all computed shortest paths
+	 */
+	PathTree<N, E> shortestPathReachable(Collection<N> sources);
+
+	/**
+	 * Computes the shortest paths from the given source to all other nodes.
+	 *
+	 * @param source The source to compute the shortest path from
+	 *
+	 * @return A tree containing all computed shortest paths
+	 */
+	PathTree<N, E> shortestPathReachable(N source);
 }

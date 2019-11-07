@@ -18,14 +18,16 @@ public interface DijkstraModule<N, E extends Edge<N>> {
 	 * Whether or not the given edge should be considered for relaxation. The algorithm will ignore the edge and not
 	 * follow it if this method returns {@code false}.
 	 *
-	 * @param edge            The edge in question
-	 * @param pathDestination The destination of the shortest path computation or {@code null} if not present
+	 * @param edge              The edge in question
+	 * @param pathDestination   The destination of the shortest path computation or {@code null} if not present
+	 * @param tentativeDistance The current tentative distance when relaxing this edge
 	 *
 	 * @return {@code True} if the edge should be considered, {@code false} otherwise
 	 */
 	@SuppressWarnings({ "SameReturnValue", "MethodReturnAlwaysConstant", "BooleanMethodNameMustStartWithQuestion" })
 	default boolean doConsiderEdgeForRelaxation(@SuppressWarnings("unused") final E edge,
-			@SuppressWarnings("unused") final N pathDestination) {
+			@SuppressWarnings("unused") final N pathDestination,
+			final TentativeDistance<? extends N, E> tentativeDistance) {
 		return true;
 	}
 
@@ -62,6 +64,18 @@ public interface DijkstraModule<N, E extends Edge<N>> {
 	}
 
 	/**
+	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right before the
+	 * given node will be settled.
+	 *
+	 * @param tentativeDistance The tentative distance wrapper of the node that will be settled next
+	 *
+	 * @return {@code True} if the computation should be aborted, {@code false} if not
+	 */
+	default boolean shouldAbortBefore(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+		return false;
+	}
+
+	/**
 	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right after the
 	 * given node has been settled.
 	 *
@@ -69,7 +83,7 @@ public interface DijkstraModule<N, E extends Edge<N>> {
 	 *
 	 * @return {@code True} if the computation should be aborted, {@code false} if not
 	 */
-	default boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+	default boolean shouldAbortAfter(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
 		return false;
 	}
 }

@@ -10,7 +10,7 @@ import de.zabuza.maglev.external.graph.Edge;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public interface Path<N, E extends Edge<N>> extends Iterable<EdgeCost<N, E>> {
+public interface Path<N, E extends Edge<N>> extends ReverselyIterable<EdgeCost<N, E>> {
 	/**
 	 * Gets the destination node of the path.
 	 *

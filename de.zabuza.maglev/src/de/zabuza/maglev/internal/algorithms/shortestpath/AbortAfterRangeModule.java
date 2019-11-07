@@ -13,7 +13,7 @@ import de.zabuza.maglev.external.graph.Edge;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class AbortAfterRangeModule<N, E extends Edge<N>> extends AbortIfModule<N, E> {
+public final class AbortAfterRangeModule<N, E extends Edge<N>> extends AbortBeforeIfModule<N, E> {
 
 	/**
 	 * Creates an module which aborts computation after exploring to the given range.

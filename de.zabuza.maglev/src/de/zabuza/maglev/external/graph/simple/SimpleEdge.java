@@ -12,7 +12,8 @@ import java.util.StringJoiner;
  *
  * @author Daniel Tischner {@literal <zabuza.dev@gmail.com>}
  */
-public final class SimpleEdge<N> implements Edge<N>, ReversedConsumer {
+@SuppressWarnings("DesignForExtension")
+public class SimpleEdge<N> implements Edge<N>, ReversedConsumer {
 	/**
 	 * The cost of the edge, i.e. its weight.
 	 */

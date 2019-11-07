@@ -1,6 +1,7 @@
 package de.zabuza.maglev.internal.algorithms.shortestpath;
 
 import de.zabuza.maglev.external.algorithms.DijkstraModule;
+import de.zabuza.maglev.external.algorithms.TentativeDistance;
 import de.zabuza.maglev.external.graph.Edge;
 
 import java.util.function.Predicate;
@@ -45,7 +46,8 @@ public final class IgnoreEdgeIfModule<N, E extends Edge<N>> implements DijkstraM
 	}
 
 	@Override
-	public boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination) {
+	public boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination,
+			final TentativeDistance<? extends N, E> tentativeDistance) {
 		return considerEdgePredicate.test(edge);
 	}
 

@@ -18,7 +18,8 @@ import java.util.function.Predicate;
  * The builder offers highly customizable algorithms based on Dijkstra, called Module-Dijkstra. That is a regular
  * Dijkstra algorithm which can be extended using extension modules that modify its behavior. Offered modules are:
  * <ul>
- *     <li>{@code AbortIfModule} - Aborts further computation as soon as a node that matches a given predicate has been settled</li>
+ *     <li>{@code AbortAfterIfModule} - Aborts further computation as soon as a node that matches a given predicate has been settled</li>
+ *     <li>{@code AbortBeforeIfModule} - Aborts further computation as soon as a node that matches a given predicate would be settled</li>
  *     <li>{@code AbortAfterRangeModule} - Only explores shortest paths up to the given range</li>
  *     <li>{@code IgnoreEdgeIfModule} - Ignores exploring edges that match the given predicate</li>
  *     <li>{@code AStarModule} - Optimization of the algorithm by utilizing a given heuristic metric</li>
@@ -180,6 +181,20 @@ public final class ShortestPathComputationBuilder<N, E extends Edge<N>> {
 	}
 
 	/**
+	 * Adds a module to be used by {@code Module-Dijkstra} which aborts computation right before a node has been settled
+	 * that matches the given predicate.
+	 *
+	 * @param predicate The predicate to test the node against, not null
+	 *
+	 * @return This builder instance
+	 */
+	public ShortestPathComputationBuilder<N, E> addModuleAbortBeforeIf(
+			final Predicate<? super TentativeDistance<N, E>> predicate) {
+		modules.add(AbortBeforeIfModule.of(Objects.requireNonNull(predicate)));
+		return this;
+	}
+
+	/**
 	 * Adds a module to be used by {@code Module-Dijkstra} which aborts computation as soon as a node has been settled
 	 * that matches the given predicate.
 	 *
@@ -187,9 +202,9 @@ public final class ShortestPathComputationBuilder<N, E extends Edge<N>> {
 	 *
 	 * @return This builder instance
 	 */
-	public ShortestPathComputationBuilder<N, E> addModuleAbortIf(
+	public ShortestPathComputationBuilder<N, E> addModuleAbortAfterIf(
 			final Predicate<? super TentativeDistance<N, E>> predicate) {
-		modules.add(AbortIfModule.of(Objects.requireNonNull(predicate)));
+		modules.add(AbortAfterIfModule.of(Objects.requireNonNull(predicate)));
 		return this;
 	}
 

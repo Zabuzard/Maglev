@@ -2,6 +2,7 @@ package de.zabuza.maglev.internal.algorithms.shortestpath;
 
 import de.zabuza.maglev.external.algorithms.HasPathCost;
 import de.zabuza.maglev.external.algorithms.Path;
+import de.zabuza.maglev.external.algorithms.PathTree;
 import de.zabuza.maglev.external.algorithms.TentativeDistance;
 import de.zabuza.maglev.external.graph.Edge;
 import de.zabuza.maglev.external.graph.Graph;
@@ -15,8 +16,9 @@ import java.util.stream.Stream;
  * Dijkstra has no sense of goal direction. When finishing the computation of the shortest path it has also computed all
  * shortest paths to nodes less far away, so the <i>search space</i> is rather big.<br>
  * <br>
- * Subclasses can override {@link #doConsiderEdgeForRelaxation(Edge, Object)} and {@link #getEstimatedDistance(Object,
- * Object)} to speedup the algorithm by giving it a sense of goal direction or exploiting precomputed knowledge.
+ * Subclasses can override {@link #doConsiderEdgeForRelaxation(Edge, Object, TentativeDistance)} and {@link
+ * #getEstimatedDistance(Object, Object)} to speedup the algorithm by giving it a sense of goal direction or exploiting
+ * precomputed knowledge.
  *
  * @param <N> Type of the node
  * @param <E> Type of the edge
@@ -93,6 +95,11 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 		return computeShortestPathCostHelper(sources, null);
 	}
 
+	@Override
+	public PathTree<N, E> shortestPathReachable(final Collection<N> sources) {
+		return new OnDemandPathTree<>(sources, computeShortestPathCostHelper(sources, null));
+	}
+
 	/**
 	 * Computes the shortest path from the given sources to the given destination and to all other nodes that were
 	 * visited in the mean time.<br>
@@ -135,20 +142,25 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 				continue;
 			}
 
+			// End the algorithm if a subclass implementation demands it
+			if (shouldAbortBefore(distance)) {
+				break;
+			}
+
 			// Settle the current node
 			nodeToSettledDistance.put(node, distance);
 
 			// End the algorithm if destination was settled or a subclass
 			// implementation demands it
 			//noinspection PointlessNullCheck
-			if ((pathDestination != null && node.equals(pathDestination)) || shouldAbort(distance)) {
+			if ((pathDestination != null && node.equals(pathDestination)) || shouldAbortAfter(distance)) {
 				break;
 			}
 
 			// Relax all outgoing edges
 			provideEdgesToRelax(distance).forEach(edge -> {
 				// Skip the edge if it should not be considered
-				if (!doConsiderEdgeForRelaxation(edge, pathDestination)) {
+				if (!doConsiderEdgeForRelaxation(edge, pathDestination, distance)) {
 					return;
 				}
 
@@ -197,13 +209,15 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	 * Whether or not the given edge should be considered for relaxation. The algorithm will ignore the edge and not
 	 * follow it if this method returns {@code false}.
 	 *
-	 * @param edge            The edge in question
-	 * @param pathDestination The destination of the shortest path computation or {@code null} if not present
+	 * @param edge              The edge in question
+	 * @param pathDestination   The destination of the shortest path computation or {@code null} if not present
+	 * @param tentativeDistance The current tentative distance when relaxing this edge
 	 *
 	 * @return {@code True} if the edge should be considered, {@code false} otherwise
 	 */
 	@SuppressWarnings({ "unused", "WeakerAccess", "BooleanMethodNameMustStartWithQuestion" })
-	protected boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination) {
+	protected boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination,
+			final TentativeDistance<? extends N, E> tentativeDistance) {
 		// Dijkstras algorithm considers every outgoing edge.
 		// This method may be used by extending classes to improve performance.
 		return true;
@@ -248,8 +262,8 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	 * Generates a stream of edges to process for relaxation.<br>
 	 * <br>
 	 * The base are all outgoing edges of the given node. Implementations are allowed to override this method in order
-	 * to further filter the stream. Additionally, the method {@link #doConsiderEdgeForRelaxation(Edge, Object)} will be
-	 * called on each element of this stream.
+	 * to further filter the stream. Additionally, the method {@link #doConsiderEdgeForRelaxation(Edge, Object,
+	 * TentativeDistance)} will be called on each element of this stream.
 	 *
 	 * @param tentativeDistance The tentative distance wrapper of the node to relax edges of
 	 *
@@ -261,6 +275,23 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	}
 
 	/**
+	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right before the
+	 * given node will be settled.
+	 *
+	 * @param tentativeDistance The tentative distance wrapper of the node that will be settled next
+	 *
+	 * @return {@code True} if the computation should be aborted, {@code false} if not
+	 */
+	@SuppressWarnings("WeakerAccess")
+	protected boolean shouldAbortBefore(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+		// Dijkstras algorithm relaxes the whole network, it only aborts if the
+		// target was settled. However, the method can be used by subclasses to
+		// abort computation earlier, for example after exploring to a fixed
+		// distance.
+		return false;
+	}
+
+	/**
 	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right after the
 	 * given node has been settled.
 	 *
@@ -269,7 +300,7 @@ public class Dijkstra<N, E extends Edge<N>> extends AbstractShortestPathComputat
 	 * @return {@code True} if the computation should be aborted, {@code false} if not
 	 */
 	@SuppressWarnings("WeakerAccess")
-	protected boolean shouldAbort(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
+	protected boolean shouldAbortAfter(@SuppressWarnings("unused") final TentativeDistance<N, E> tentativeDistance) {
 		// Dijkstras algorithm relaxes the whole network, it only aborts if the
 		// target was settled. However, the method can be used by subclasses to
 		// abort computation earlier, for example after exploring to a fixed

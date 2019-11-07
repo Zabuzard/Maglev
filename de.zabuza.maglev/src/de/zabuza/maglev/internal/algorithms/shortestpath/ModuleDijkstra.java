@@ -80,15 +80,16 @@ public final class ModuleDijkstra<N, E extends Edge<N>> extends Dijkstra<N, E> {
 	 * Whether or not the given edge should be considered for relaxation. The algorithm will ignore the edge and not
 	 * follow it if this method returns {@code false}.<br>
 	 * <br>
-	 * This will be the case if any modules {@link DijkstraModule#doConsiderEdgeForRelaxation(Edge, Object)} method
-	 * returns {@code false}.
+	 * This will be the case if any modules {@link DijkstraModule#doConsiderEdgeForRelaxation(Edge, Object,
+	 * TentativeDistance)} method returns {@code false}.
 	 */
 	@Override
-	protected boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination) {
+	protected boolean doConsiderEdgeForRelaxation(final E edge, final N pathDestination,
+			final TentativeDistance<? extends N, E> tentativeDistance) {
 		// Ignore the base, it always considers all edges
 		// Ask all modules and accumulate with logical and
 		for (final DijkstraModule<N, E> module : modules) {
-			final boolean doNotConsider = !module.doConsiderEdgeForRelaxation(edge, pathDestination);
+			final boolean doNotConsider = !module.doConsiderEdgeForRelaxation(edge, pathDestination, tentativeDistance);
 			if (doNotConsider) {
 				return false;
 			}
@@ -143,22 +144,47 @@ public final class ModuleDijkstra<N, E extends Edge<N>> extends Dijkstra<N, E> {
 	}
 
 	/**
+	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right before the
+	 * given node will be settled.<br>
+	 * <br>
+	 * This will be the case if any modules {@link DijkstraModule#shouldAbortBefore(TentativeDistance)} method returns
+	 * {@code true}.
+	 *
+	 * @param tentativeDistance The tentative distance wrapper of the node that will be settled next
+	 *
+	 * @return {@code True} if the computation should be aborted, {@code false} if not
+	 */
+	@Override
+	protected boolean shouldAbortBefore(final TentativeDistance<N, E> tentativeDistance) {
+		// Ignore the base, it never aborts computation
+		// Ask all modules and accumulate with logical or
+		for (final DijkstraModule<N, E> module : modules) {
+			final boolean abort = module.shouldAbortBefore(tentativeDistance);
+			if (abort) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Whether or not the algorithm should abort computation of the shortest path. The method is called right after the
 	 * given node has been settled.<br>
 	 * <br>
-	 * This will be the case if any modules {@link DijkstraModule#shouldAbort(TentativeDistance)} method returns {@code
-	 * true}.
+	 * This will be the case if any modules {@link DijkstraModule#shouldAbortAfter(TentativeDistance)} method returns
+	 * {@code true}.
 	 *
 	 * @param tentativeDistance The tentative distance wrapper of the node that was settled
 	 *
 	 * @return {@code True} if the computation should be aborted, {@code false} if not
 	 */
 	@Override
-	protected boolean shouldAbort(final TentativeDistance<N, E> tentativeDistance) {
+	protected boolean shouldAbortAfter(final TentativeDistance<N, E> tentativeDistance) {
 		// Ignore the base, it never aborts computation
 		// Ask all modules and accumulate with logical or
 		for (final DijkstraModule<N, E> module : modules) {
-			final boolean abort = module.shouldAbort(tentativeDistance);
+			final boolean abort = module.shouldAbortAfter(tentativeDistance);
 			if (abort) {
 				return true;
 			}
