@@ -79,29 +79,29 @@ Consider the following simple graph setup:
 ![Graph example](https://i.imgur.com/lumZoLj.png)
 
 ```java
-SimpleGraph<Integer, SimpleEdge<Integer>>graph=new SimpleGraph<>();
+SimpleGraph<Integer, SimpleEdge<Integer>> graph = new SimpleGraph<>();
 
-		graph.addNode(1);
-		graph.addNode(2);
-		graph.addNode(3);
-		graph.addNode(4);
-		graph.addNode(5);
+graph.addNode(1);
+graph.addNode(2);
+graph.addNode(3);
+graph.addNode(4);
+graph.addNode(5);
 
-		graph.addEdge(new SimpleEdge<>(1,2,8));
-		graph.addEdge(new SimpleEdge<>(1,3,1));
-		graph.addEdge(new SimpleEdge<>(2,5,2));
-		graph.addEdge(new SimpleEdge<>(3,4,2));
-		graph.addEdge(new SimpleEdge<>(4,2,1));
-		graph.addEdge(new SimpleEdge<>(4,5,5));
+graph.addEdge(new SimpleEdge<>(1, 2, 8));
+graph.addEdge(new SimpleEdge<>(1, 3, 1));
+graph.addEdge(new SimpleEdge<>(2, 5, 2));
+graph.addEdge(new SimpleEdge<>(3, 4, 2));
+graph.addEdge(new SimpleEdge<>(4, 2, 1));
+graph.addEdge(new SimpleEdge<>(4, 5, 5));
 ```
 
 Next, we create an algorithm by using the builder with default settings:
 
 ```java
-var algo=new ShortestPathComputationBuilder<>(graph)
-		.build();
-		var path=algo.shortestPath(1,5);
-		System.out.println(path);
+var algo = new ShortestPathComputationBuilder<>(graph)
+        .build();
+var path = algo.shortestPath(1, 5);
+System.out.println(path);
 ```
 
 The algorithm correctly computes the shortest path from node `1` to `5` (as highlighted in the picture).
@@ -111,11 +111,11 @@ The algorithm correctly computes the shortest path from node `1` to `5` (as high
 The next example demonstrates how to ignore node `4` in all computations:
 
 ```java
-var algo=new ShortestPathComputationBuilder<>(graph)
-		.addModuleIgnoreEdgeIf(edge->edge.getDestination().equals(4))
-		.build();
-		var path=algo.shortestPath(1,5);
-		System.out.println(path);
+var algo = new ShortestPathComputationBuilder<>(graph)
+        .addModuleIgnoreEdgeIf(edge -> edge.getDestination().equals(4))
+        .build();
+var path = algo.shortestPath(1, 5);
+System.out.println(path);
 ```
 
 ***
@@ -124,14 +124,14 @@ The third example shows how to compute all reachable shortest path costs, starti
 as node `4` has been settled:
 
 ```java
-var algo=new ShortestPathComputationBuilder<>(graph)
-		.addModuleAbortAfterIf(dist->dist.getNode().equals(4))
-		.build();
-		var nodeToCost=algo.shortestPathCostsReachable(1);
+var algo = new ShortestPathComputationBuilder<>(graph)
+        .addModuleAbortAfterIf(dist -> dist.getNode().equals(4))
+        .build();
+var nodeToCost = algo.shortestPathCostsReachable(1);
 
-		nodeToCost.entrySet().stream()
-		.map(entry->entry.getKey()+"="+entry.getValue().getPathCost())
-		.forEach(System.out::println);
+nodeToCost.entrySet().stream()
+        .map(entry -> entry.getKey() + "=" + entry.getValue().getPathCost())
+        .forEach(System.out::println);
 ```
 
 ***
@@ -139,11 +139,11 @@ var algo=new ShortestPathComputationBuilder<>(graph)
 The last example uses ordinary Dijkstra without any modules or optimizations:
 
 ```java
-var algo=new ShortestPathComputationBuilder<>(graph)
-		.resetOrdinaryDijkstra()
-		.build();
-		var path=algo.shortestPath(1,5);
-		System.out.println(path);
+var algo = new ShortestPathComputationBuilder<>(graph)
+        .resetOrdinaryDijkstra()
+        .build();
+var path = algo.shortestPath(1, 5);
+System.out.println(path);
 ```
 
 ***
@@ -157,11 +157,11 @@ on a graph consisting of points in a 2-dimensional space.
 Consider the following simple class for points in a 2-dimensional space
 
 ```java
-class Point {
+class Point { 
 	private final int x;
 	private final int y;
-
-	// constructor, getter, equals, hashCode and toString omitted
+	
+	// constructor, getter, equals, hashCode and toString ommitted
 }
 ```
 
@@ -170,7 +170,7 @@ Next, we define our heuristic metric
 ```java
 class EuclideanDistance implements Metric<Point> {
 	@Override
-	public double distance(Point a, Point b) {
+	public double distance(Point a, Point b) { 
 		return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
 	}
 }
@@ -179,29 +179,29 @@ class EuclideanDistance implements Metric<Point> {
 Now a simple graph consisting of such points:
 
 ```java
-SimpleGraph<Point, SimpleEdge<Point>>graph=new SimpleGraph<>();
+SimpleGraph<Point, SimpleEdge<Point>> graph = new SimpleGraph<>();
 
-		var a=Point.of(1,2);
-		var b=Point.of(5,7);
-		var c=Point.of(-10,4);
+var a = Point.of(1, 2);
+var b = Point.of(5, 7);
+var c = Point.of(-10, 4);
 
-		graph.add(a);
-		graph.add(b);
-		graph.add(c);
+graph.add(a);
+graph.add(b);
+graph.add(c);
 
-		graph.addEdge(new SimpleEdge<>(a,b,1));
-		graph.addEdge(new SimpleEdge<>(b,c,1));
-		graph.addEdge(new SimpleEdge<>(a,c,5));
+graph.addEdge(new SimpleEdge<>(a, b, 1));
+graph.addEdge(new SimpleEdge<>(b, c, 1));
+graph.addEdge(new SimpleEdge<>(a, c, 5));
 ```
 
 and finally the algorithm operating on this graph by using A-Star with the Euclidean distance:
 
 ```java
-var algo=new ShortestPathComputationBuilder<>(graph)
-		.setMetric(new EuclideanDistance())
-		.build();
-		var path=algo.shortestPath(a,c);
-		System.out.println(path);
+var algo = new ShortestPathComputationBuilder<>(graph)
+        .setMetric(new EuclideanDistance())
+        .build();
+var path = algo.shortestPath(a, c);
+System.out.println(path);
 ```
 
 ***
