@@ -1,6 +1,6 @@
 # Maglev
 
-[![maven-central](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev)](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev) [![javadoc](https://javadoc.io/badge2/io.github.zabuzard.maglev/maglev/javadoc.svg)](https://javadoc.io/doc/io.github.zabuzard.maglev/maglev) [![Java](https://img.shields.io/badge/Java-11%2B-ff696c)](https://img.shields.io/badge/Java-11%2B-ff696c) [![license](https://img.shields.io/github/license/Zabuzard/Maglev)](https://img.shields.io/github/license/Zabuzard/Maglev)
+[![maven-central](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev)](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev) [![javadoc](https://javadoc.io/badge2/io.github.zabuzard.maglev/maglev/javadoc.svg?style=flat)](https://javadoc.io/doc/io.github.zabuzard.maglev/maglev) [![Java](https://img.shields.io/badge/Java-11%2B-ff696c)](https://img.shields.io/badge/Java-11%2B-ff696c) [![license](https://img.shields.io/github/license/Zabuzard/Maglev)](https://img.shields.io/github/license/Zabuzard/Maglev)
 
 Maglev is a simple library that provides fast and generic solutions for shortest path problems (SPP). It is designed
 generic and can easily be modified and extended.
