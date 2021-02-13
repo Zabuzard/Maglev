@@ -103,7 +103,7 @@ Next, we create an algorithm by using the builder with default settings:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .build();
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -116,8 +116,8 @@ The next example demonstrates how to ignore node `4` in all computations:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .addModuleIgnoreEdgeIf(edge -> edge.getDestination().equals(4))
-        .build();
+    .addModuleIgnoreEdgeIf(edge -> edge.getDestination().equals(4))
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -129,13 +129,13 @@ as node `4` has been settled:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .addModuleAbortAfterIf(dist -> dist.getNode().equals(4))
-        .build();
+    .addModuleAbortAfterIf(dist -> dist.getNode().equals(4))
+    .build();
 var nodeToCost = algo.shortestPathCostsReachable(1);
 
 nodeToCost.entrySet().stream()
-        .map(entry -> entry.getKey() + "=" + entry.getValue().getPathCost())
-        .forEach(System.out::println);
+    .map(entry -> entry.getKey() + "=" + entry.getValue().getPathCost())
+    .forEach(System.out::println);
 ```
 
 ***
@@ -144,8 +144,8 @@ The last example uses ordinary Dijkstra without any modules or optimizations:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .resetOrdinaryDijkstra()
-        .build();
+    .resetOrdinaryDijkstra()
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -162,10 +162,10 @@ Consider the following simple class for points in a 2-dimensional space
 
 ```java
 class Point { 
-	private final int x;
-	private final int y;
-	
-	// constructor, getter, equals, hashCode and toString ommitted
+    private final int x;
+    private final int y;
+
+    // constructor, getter, equals, hashCode and toString ommitted
 }
 ```
 
@@ -173,10 +173,10 @@ Next, we define our heuristic metric
 
 ```java
 class EuclideanDistance implements Metric<Point> {
-	@Override
-	public double distance(Point a, Point b) { 
-		return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
-	}
+    @Override
+    public double distance(Point a, Point b) { 
+        return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
+    }
 }
 ```
 
@@ -202,8 +202,8 @@ and finally the algorithm operating on this graph by using A-Star with the Eucli
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .setMetric(new EuclideanDistance())
-        .build();
+    .setMetric(new EuclideanDistance())
+    .build();
 var path = algo.shortestPath(a, c);
 System.out.println(path);
 ```
