@@ -28,8 +28,8 @@ By utilizing efficient and well known algorithms, such as:
 * A-Star
 * ALT (A-Star with landmarks)
 
-and providing a high degree of customizability by offering ways to manipulate the algorithm using extensions called _
-Dijkstra modules_.
+and providing a high degree of customizability by offering ways to manipulate the algorithm using extensions called
+_Dijkstra modules_.
 
 The main interface of the algorithms provide the following methods:
 
