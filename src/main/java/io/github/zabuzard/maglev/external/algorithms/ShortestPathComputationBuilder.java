@@ -382,7 +382,7 @@ public final class ShortestPathComputationBuilder<N, E extends Edge<N>> {
 	 *                               no metric.
 	 */
 	public ShortestPathComputation<N, E> build() {
-		if (modules.isEmpty()) {
+		if (modules.isEmpty() && !useAStarModule) {
 			return new Dijkstra<>(graph);
 		}
 
