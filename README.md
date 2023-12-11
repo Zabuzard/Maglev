@@ -1,6 +1,10 @@
 # Maglev
 
-[![maven-central](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev)](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev) [![javadoc](https://javadoc.io/badge2/io.github.zabuzard.maglev/maglev/javadoc.svg)](https://javadoc.io/doc/io.github.zabuzard.maglev/maglev) [![Java](https://img.shields.io/badge/Java-11%2B-ff696c)](https://img.shields.io/badge/Java-11%2B-ff696c) [![license](https://img.shields.io/github/license/Zabuzard/Maglev)](https://img.shields.io/github/license/Zabuzard/Maglev)
+[![codefactor](https://img.shields.io/codefactor/grade/github/Zabuzard/Maglev)](https://www.codefactor.io/repository/github/zabuzard/maglev)
+[![maven-central](https://img.shields.io/maven-central/v/io.github.zabuzard.maglev/maglev)](https://search.maven.org/search?q=g:io.github.zabuzard.maglev)
+[![javadoc](https://javadoc.io/badge2/io.github.zabuzard.maglev/maglev/javadoc.svg?style=flat&color=AA82FF)](https://javadoc.io/doc/io.github.zabuzard.maglev/maglev)
+![Java](https://img.shields.io/badge/Java-11%2B-ff696c)
+[![license](https://img.shields.io/github/license/Zabuzard/Maglev)](https://github.com/Zabuzard/Maglev/blob/master/LICENSE)
 
 Maglev is a simple library that provides fast and generic solutions for shortest path problems (SPP). It is designed
 generic and can easily be modified and extended.
@@ -24,8 +28,8 @@ By utilizing efficient and well known algorithms, such as:
 * A-Star
 * ALT (A-Star with landmarks)
 
-and providing a high degree of customizability by offering ways to manipulate the algorithm using extensions called _
-Dijkstra modules_.
+and providing a high degree of customizability by offering ways to manipulate the algorithm using extensions called
+_Dijkstra modules_.
 
 The main interface of the algorithms provide the following methods:
 
@@ -99,7 +103,7 @@ Next, we create an algorithm by using the builder with default settings:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .build();
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -112,8 +116,8 @@ The next example demonstrates how to ignore node `4` in all computations:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .addModuleIgnoreEdgeIf(edge -> edge.getDestination().equals(4))
-        .build();
+    .addModuleIgnoreEdgeIf(edge -> edge.getDestination().equals(4))
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -125,13 +129,13 @@ as node `4` has been settled:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .addModuleAbortAfterIf(dist -> dist.getNode().equals(4))
-        .build();
+    .addModuleAbortAfterIf(dist -> dist.getNode().equals(4))
+    .build();
 var nodeToCost = algo.shortestPathCostsReachable(1);
 
 nodeToCost.entrySet().stream()
-        .map(entry -> entry.getKey() + "=" + entry.getValue().getPathCost())
-        .forEach(System.out::println);
+    .map(entry -> entry.getKey() + "=" + entry.getValue().getPathCost())
+    .forEach(System.out::println);
 ```
 
 ***
@@ -140,8 +144,8 @@ The last example uses ordinary Dijkstra without any modules or optimizations:
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .resetOrdinaryDijkstra()
-        .build();
+    .resetOrdinaryDijkstra()
+    .build();
 var path = algo.shortestPath(1, 5);
 System.out.println(path);
 ```
@@ -158,10 +162,10 @@ Consider the following simple class for points in a 2-dimensional space
 
 ```java
 class Point { 
-	private final int x;
-	private final int y;
-	
-	// constructor, getter, equals, hashCode and toString ommitted
+    private final int x;
+    private final int y;
+
+    // constructor, getter, equals, hashCode and toString ommitted
 }
 ```
 
@@ -169,10 +173,10 @@ Next, we define our heuristic metric
 
 ```java
 class EuclideanDistance implements Metric<Point> {
-	@Override
-	public double distance(Point a, Point b) { 
-		return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
-	}
+    @Override
+    public double distance(Point a, Point b) { 
+        return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
+    }
 }
 ```
 
@@ -198,8 +202,8 @@ and finally the algorithm operating on this graph by using A-Star with the Eucli
 
 ```java
 var algo = new ShortestPathComputationBuilder<>(graph)
-        .setMetric(new EuclideanDistance())
-        .build();
+    .setMetric(new EuclideanDistance())
+    .build();
 var path = algo.shortestPath(a, c);
 System.out.println(path);
 ```
